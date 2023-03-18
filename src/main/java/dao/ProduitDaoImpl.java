@@ -1,0 +1,48 @@
+package dao;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+
+import metier.Categorie;
+import metier.Produit;
+import util.JpaUtil;
+public class ProduitDaoImpl implements IProduitDao {
+private EntityManager entityManager=JpaUtil.getEntityManager("TP5_JEE");
+@Override
+public Produit save(Produit p) {
+EntityTransaction tx = entityManager.getTransaction();
+tx.begin();
+entityManager.persist(p);
+tx.commit();
+return p;
+}
+@Override
+public List<Produit> produitsParMC(String mc) {
+List<Produit> prods = entityManager.createQuery("select p from Produit p where p.nomProduit like :mc").setParameter("mc", "%"+mc+"%").getResultList();
+		 return prods;
+		}
+
+public List<Produit> produitsParCat(Long id) {
+List<Produit> prods = entityManager.createQuery("select p from Produit p where p.categorie.idCat =" + id).getResultList();
+		 return prods;
+		}
+		@Override
+		public Produit getProduit(Long id) {
+		 return entityManager.find(Produit.class, id);
+		}
+		@Override
+		public Produit updateProduit(Produit p) {
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
+		entityManager.merge(p);
+		tx.commit();
+		return p;
+		}
+		@Override
+		public void deleteProduit(Long id) {
+		Produit produit = entityManager.find(Produit.class, id);
+		entityManager.getTransaction().begin();
+		entityManager.remove(produit);
+		entityManager.getTransaction().commit();
+		}
+		}
